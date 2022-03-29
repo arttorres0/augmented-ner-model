@@ -18,7 +18,9 @@ In this notebook, training data can be augmented to generate more examples and v
 
 ## Results
 
-This notebook was executed to verify how effective data augmentation is for a BI-LSTM+CRF models when running a NER task. The dataset has 3000 examples (2400 for training and 600 for testing, using our train/test split, which can be changed), and the whole original training data was used, plus some variable amount of augmented examples. This amount varied from 0% to 100% the original data (e.g.: 50% means training data consisted of 2400 original examples and 1200 augmented ones). Around 10 models for each of these amounts were trained with the same training data, to check model variance. The table below contains the F1-score(%) for each model, then the average and standard deviation for each amount.
+This notebook was executed to verify how effective data augmentation is for BI-LSTM+CRF models when running a NER task. We used a combination of two text augmentation techniques: entity replacement, where we replace words of some tag with other words of the same tag (e.g: I want to see a *movie* -> I want to see a *tv show*); and random token removal, where we randomly remove words from a set of words of same tag (e.g: My name is *Arthur Torres* -> My name is *Torres*).
+
+The dataset [1] has 3000 examples (2400 for training and 600 for testing, using our train/test split, which can be changed), and the whole original training data was used, plus some variable amount of augmented examples. This amount varied from 0% to 100% the original data (e.g.: 50% means training data consisted of 2400 original examples and 1200 augmented ones). Around 10 models for each of these amounts were trained with the same training data, to check model variance. The table below contains the F1-score(%) for each model, then the average and standard deviation for each amount.
 
 | Amount of augmentation | Model 1 | Model 2 | Model 3 | Model 4 | Model 5 | Model 6 | Model 7 | Model 8 | Model 9 | Model 10 | avg | std |
 | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
