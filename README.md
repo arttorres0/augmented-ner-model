@@ -43,9 +43,15 @@ Another interesting result from our experiments so far is that the standard devi
 ## References
 
 [1] Huang Z., Xu W., Yu K. Bidirectional LSTM-CRF Models for Sequence Tagging. Em: arXiv preprint arXiv:1508.01991, 2015.
+
 [2] Panchendrarajan R., Amaresan A. Bidirectional LSTM-CRF for Named Entity Recognition. Em: Proceedings of the 32nd Pacific Asia Conference on Language, Information and Computation, pp. 531 – 540, 2018.
+
 [3] Lee C. LSTM-CRF Models for Named Entity Recognition. Em: IEICE Transactions on Information and Systems, pp. 882 – 887, 2017.
+
 [4] Zhang X., Zhao J., Lecun Y. Character-level Convolutional Networks for Text Classification. Em: Proceedings of the 28th International Conference on Neural Information Processing Systems, Volume 1, pp. 649 – 657, 2016.
+
 [5] Wei J., Zou K. EDA: Easy Data Augmentation Techniques for Boosting Performance on Text Classification Tasks. Em: arXiv preprint arXiv:1901.11196, 2019.
+
 [6] Vieira, H. Recognition and Linking of Product Mentions in User-generated Contents. 127 p. Thesis (Doutorado em Informática) - Universidade Federal do Amazonas, Manaus, 2018.
+
 [7] Li J, Sun Y, Johnson RJ, Sciaky D, Wei CH, Leaman R, Davis AP, Mattingly CJ, Wiegers TC, and Lu Z. Annotating chemicals, diseases and their interactions in biomedical literature. In: _Proceedings of the Fifth BioCreative Challenge Evaluation Workshop_, pp 173-182. Dataset Download link: https://biocreative.bioinformatics.udel.edu/media/store/files/2016/CDR_Data.zip
