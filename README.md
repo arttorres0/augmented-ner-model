@@ -1,13 +1,13 @@
-# NER with BI-LSTM+CRF
+# Augmented NER with BI-LSTM+CRF and BERT
 
-This project contains a Jupyter Notebook that creates, trains and evaluates BI-LSTM+CRF models. It was originally developed using a medical dataset from BioCreative[1] and executed using Google Colab, but different datasets and platforms can be used, if proper adjustments to the notebook are made.
+This project contains several Jupyter Notebooks that create, train and evaluate BI-LSTM+CRF[] and BERT[] models for NER task[]. It was developed using 5 low-resource domain (highly-specialized language fields) datasets:  BioCreative V CDR Task[1], i2b2 2010[], MaSciP[], JusBrasil[], and CUAD v1[] (adapted to NER task[]) . It was executed using Google Colab, but different datasets and platforms can be used, if proper adjustments to the notebook are made.
 
-In this notebook, training data can be augmented to generate more examples and verify the impact of data augmentation on the model overall eficiency. Random points from the training data can be removed as well, if desired.
+In this project, training data is augmented to generate more examples and verify the impact of data augmentation on the model overall eficiency. Random points from the training data can be removed as well, if desired.
 
 ## Requirements
 
 - Google Colab
-- High-end GPU (highly recommended)
+- High-end GPU (highly recommended for BERT models)
 - Python3
 - Tensorflow 1.x
 - GoogleDrive and GoogleAuth (not mandatory, only used to store files)
@@ -15,43 +15,22 @@ In this notebook, training data can be augmented to generate more examples and v
 - Numpy
 - Keras
 - Sklearn
+- Transformers (HuggingFace)
+
+## Setup
+
+For all five datasets, if a train-dev-test split was not originally provided, we used 15% of the original data for testing and 85% for training, and we used 15% of the training data as validation data. To assess the impact of data augmentation in various low-resource scenarios, this study selected different sentence subsets from each training dataset: 50, 150, and 500 sentences. Additionally, subsets amounting to 25%, 50%, and 75% of the original dataset size are chosen, provided these subsets exceed 500 sentences. The validation and testing datasets remain unaltered throughout the evaluation.
+
+We evaluate the efficacy of two text augmentation techniques — Mention Replacement (MR)[] and Contextual Word Replacement (CWR)[] — on two widely-used NER models[], Bi-LSTM+CRF and BERT. MR replaces randomly-selected mentions, i.e., one or more contiguous tokens with a uniform label type, with other mentions from the original training set that have the same label type. The number of tokens in the replacement mention may differ from the original (e.g. "I took a medicine today for acute colitis." -> "I took a medicine today for **cancer**."). CWR, on the other hand, employs BERT models to replace words contextually within a sentence (e.g. "I took a medicine today for acute colitis." -> "I **got** a medicine **now** for acute colitis.").
+ 
+For each dataset and its subsets, we gradually increased the amount of augmented data in the training, ranging from 0% - original data without augmented data - to 500% - original data plus 5 times the amount of original data as augmented data. Finally, we observed validation loss as a parameter to interrupt model training, if it stopped decreasing for 5 epochs. This setup yields 784 groups of models, considering the combination of all datasets and subsets, architectures, and augmentation techniques and amounts. Each group consists of 10 models trained from scratch, which we evaluated in the testing data, in order to check model variance. F1-score of each model was calculated on the respective test dataset, and we took the average for each of the groups. You can see these results in files "results_MR.xslx" and "results_CWR.xsls".
+
+For more details please check our paper (on review).
 
 ## Results
 
-This notebook was executed to verify how effective data augmentation is for BI-LSTM+CRF models when running a NER task [1, 2, 3]. We used a combination of two text augmentation techniques: entity replacement, where we replace words of some tag with other words of the same tag (e.g: I want to see a *movie* -> I want to see a *tv show*); and random token removal, where we randomly remove words from a set of words of same tag (e.g: My name is *Arthur Torres* -> My name is *Torres*) [4, 5, 6].
-
-The dataset has 3000 examples (2400 for training and 600 for testing, using our train/test split, which can be changed) [7]. The whole original training data was used, plus some variable amount of augmented examples, which ranged from 0% to 100% of the original data (e.g.: 50% means training data consisted of 2400 original examples and 1200 augmented ones). Around 10 models for each of these amounts were trained with the same training data, to check model variance. The table below contains the F1-score(%) for each model, then the average and standard deviation for each amount.
-
-| Amount of augmentation | Model 1 | Model 2 | Model 3 | Model 4 | Model 5 | Model 6 | Model 7 | Model 8 | Model 9 | Model 10 | avg | std |
-| ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
-| 0% | 30.3 | 42.1 | 49.1 | 39.2 | 39.4 | 20.2 | 46.4 | 48.1 | 46.9 | - | 40.19 | 9.54 |
-| 10% | 50 | 43.7 | 59.4 | 69.5 | 72.6 | 43.5 | 48.2 | 40.8 | 54.9 | 50.4 | 53.62 | 11.48 |
-| 20% | 59.3 | 55.9 | 52.2 | 64.1 | 53.9 | 54.6 | 72.7 | 63.6 | - | - | 59.54 | 6.91 |
-| 30% | 66.4 | 72.5 | 61.3 | 27.5 | 43.4 | 63.9 | 64.4 | 60.1 | 48.6 | 49.7 | 55.78 | 13.43 |
-| 40% | 76.8 | 74.4 | 77.3 | 76.8 | 76.6 | 73.8 | 77.6 | 79 | 67.3 | 75.7 | 75.53 | 3.26 |
-| 50% | 75.6 | 74.8 | 55.7 | 68.9 | 70.4 | 70 | 74.9 | 76.8 | 76 | - | 71.46 | 6.59 |
-| 60% | 75.6 | 76.7 | 76.7 | 74.7 | 77.2 | 74.5 | 78.3 | 77.9 | 78.1 | 76.1 | 76.58 | 1.35 |
-| 70% | 67.7 | 76.5 | 76.9 | 74.9 | 78.7 | 79 | 74.5 | 80.1 | 77.5 | 68.7 | 75.45 | 4.2 |
-| 80% | 77 | 77.6 | 78.4 | 78.1 | 74 | 50.5 | 76.4 | 79.8 | 75.3 | - | 74.12 | 9.02 |
-| 90% | 76.4 | 77.4 | 77.2 | 76.3 | 80 | 76.9 | 78.4 | 75.2 | 71.2 | 77.5 | 76.65 | 2.31 |
-| 100% | 77.2 | 75.4 | 76.2 | 77.6 | 75.8 | 76.9 | 76.6 | 77.4 | 75.2 | 77.9 | 76.62 | 0.94 |
-
-We observed a significant increase in F1-score when we increased training data using augmented examples, from 40.19% when no augmentation is used, to 76.62% when 100% of augmented data is used. However, this improvement reached a plateau with way less augmented data (around 40%), which means there may be a limit of how much augmentation can be used to improve the model.
-
-Another interesting result from our experiments so far is that the standard deviation of those F1-scores reduced when increasing augmented data, from 9.54 when no augmentation was used, to 0.94 when adding 100% augmented examples to the training dataset. This means augmenting data may produce more uniform models.
+Please check files "results_MR.xslx" and "results_CWR.xsls" for all model results. We observe a modest increase in model quality for lower-sized subsets before the model starts to reduce the F1-score value, when analyzing models augmented with MR. However, for the full dataset and other larger subsets, the average F1-score has not increased, maintaining or losing quality. The only exceptions to this are MaSciP (BERT), in which every subset benefits from data augmentation, and JusBrasil (Bi-LSTM+CRF), in which every subset loses model quality for every amount of data augmentation. This reduction in F1-score may be a consequence of the introduction of invalid augmented data, which had their original ground-truth labels altered by the augmentation technique. This suggests that data augmentation should be used with caution, as the injection of high noise into the training dataset may cause models to overfit these invalid instances.
+Models augmented with CWR show similar results. However, we notice that more models benefit from data augmentation. This is an indicator that this technique produces more data variability than MR in the studied datasets, which makes sense, as BERT can suggest several different tokens. We also have more possible target replacements ("O" tokens) than when applying MR, which targets non-"O" tokens. On the other hand, we observe a more inconsistent pattern of improvement in F1-score across different subset sizes. This is also a consequence of the higher variability introduced by BERT, but on the negative side, where there is more noise introduction than actual valid augmented examples in the datasets.
+We also picked the best augmentated model, in terms of average F1-score, for each dataset subset (if it exists), and took T-student tests to assess the improvement. We note that of the 112 best models, 11, or about 10%, were found to present statistically significant improvements in the average F1-score. The conclusions above are also evident here, that is, first, smaller subsets improve with data augmentation, unlike larger subsets, and, second, in spite of these promising results, there is not an augmentation amount that yields the best results.
 
 ## References
-
-[1] Huang Z., Xu W., Yu K. Bidirectional LSTM-CRF Models for Sequence Tagging. Em: arXiv preprint arXiv:1508.01991, 2015.
-
-[2] Panchendrarajan R., Amaresan A. Bidirectional LSTM-CRF for Named Entity Recognition. Em: Proceedings of the 32nd Pacific Asia Conference on Language, Information and Computation, pp. 531 – 540, 2018.
-
-[3] Lee C. LSTM-CRF Models for Named Entity Recognition. Em: IEICE Transactions on Information and Systems, pp. 882 – 887, 2017.
-
-[4] Zhang X., Zhao J., Lecun Y. Character-level Convolutional Networks for Text Classification. Em: Proceedings of the 28th International Conference on Neural Information Processing Systems, Volume 1, pp. 649 – 657, 2016.
-
-[5] Wei J., Zou K. EDA: Easy Data Augmentation Techniques for Boosting Performance on Text Classification Tasks. Em: arXiv preprint arXiv:1901.11196, 2019.
-
-[6] Vieira, H. Recognition and Linking of Product Mentions in User-generated Contents. 127 p. Thesis (Doutorado em Informática) - Universidade Federal do Amazonas, Manaus, 2018.
-
-[7] Li J, Sun Y, Johnson RJ, Sciaky D, Wei CH, Leaman R, Davis AP, Mattingly CJ, Wiegers TC, and Lu Z. Annotating chemicals, diseases and their interactions in biomedical literature. In: _Proceedings of the Fifth BioCreative Challenge Evaluation Workshop_, pp 173-182. Dataset Download link: https://biocreative.bioinformatics.udel.edu/media/store/files/2016/CDR_Data.zip
